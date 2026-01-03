@@ -78,12 +78,3 @@ const init = async () => {
 };
 
 init();
-```
-
-## Tahap 9: File Pendukung
-
-### 9.1 .gitignore
-
-Buat file `.gitignore`:
-```;
-node_modules.env.DS_Store;
