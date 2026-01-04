@@ -27,8 +27,8 @@ class PlaylistsHandler {
     });
 
     const response = h.response({
-      status: "success",
-      message: "Playlist berhasil ditambahkan",
+      status: 'success',
+      message: 'Playlist berhasil ditambahkan',
       data: {
         playlistId,
       },
@@ -42,7 +42,7 @@ class PlaylistsHandler {
     const playlists = await this._service.getPlaylists(credentialId);
 
     return {
-      status: "success",
+      status: 'success',
       data: {
         playlists,
       },
@@ -57,8 +57,8 @@ class PlaylistsHandler {
     await this._service.deletePlaylistById(id);
 
     return {
-      status: "success",
-      message: "Playlist berhasil dihapus",
+      status: 'success',
+      message: 'Playlist berhasil dihapus',
     };
   }
 
@@ -71,11 +71,11 @@ class PlaylistsHandler {
     await this._service.verifyPlaylistAccess(playlistId, credentialId);
     await this._songsService.getSongById(songId);
     await this._service.addSongToPlaylist(playlistId, songId);
-    await this._service.addActivity(playlistId, songId, credentialId, "add");
+    await this._service.addActivity(playlistId, songId, credentialId, 'add');
 
     const response = h.response({
-      status: "success",
-      message: "Lagu berhasil ditambahkan ke playlist",
+      status: 'success',
+      message: 'Lagu berhasil ditambahkan ke playlist',
     });
     response.code(201);
     return response;
@@ -89,7 +89,7 @@ class PlaylistsHandler {
     const playlist = await this._service.getSongsFromPlaylist(playlistId);
 
     return {
-      status: "success",
+      status: 'success',
       data: {
         playlist,
       },
@@ -104,11 +104,11 @@ class PlaylistsHandler {
 
     await this._service.verifyPlaylistAccess(playlistId, credentialId);
     await this._service.deleteSongFromPlaylist(playlistId, songId);
-    await this._service.addActivity(playlistId, songId, credentialId, "delete");
+    await this._service.addActivity(playlistId, songId, credentialId, 'delete');
 
     return {
-      status: "success",
-      message: "Lagu berhasil dihapus dari playlist",
+      status: 'success',
+      message: 'Lagu berhasil dihapus dari playlist',
     };
   }
 
@@ -120,7 +120,7 @@ class PlaylistsHandler {
     const activities = await this._service.getActivities(playlistId);
 
     return {
-      status: "success",
+      status: 'success',
       data: {
         playlistId,
         activities,

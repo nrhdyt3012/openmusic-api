@@ -1,5 +1,5 @@
 // src/validator/users/schema.js
-const Joi = require("joi");
+const Joi = require('joi');
 
 const UserPayloadSchema = Joi.object({
   username: Joi.string().required(),

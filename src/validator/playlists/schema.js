@@ -1,5 +1,5 @@
 // src/validator/playlists/schema.js
-const Joi = require("joi");
+const Joi = require('joi');
 
 const PlaylistPayloadSchema = Joi.object({
   name: Joi.string().required(),
