@@ -1,7 +1,0 @@
-node_modules/
-migrations/
-*.log
-.env
-dist/
-build/
-coverage/
