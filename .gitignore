@@ -24,3 +24,7 @@ yarn-error.log*
 # Build files
 dist/
 build/
+
+# Upload files
+src/upload/images/*
+!src/upload/images/.gitkeep
