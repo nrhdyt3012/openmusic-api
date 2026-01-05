@@ -19,11 +19,16 @@ class ConsumerService {
         durable: true,
       });
 
+      // Set prefetch untuk memproses 1 pesan pada satu waktu
+      channel.prefetch(1);
+
       channel.consume('export:playlist', async (message) => {
         try {
           const { playlistId, targetEmail } = JSON.parse(
             message.content.toString(),
           );
+
+          console.log(`Processing export request for playlist: ${playlistId}`);
 
           const playlist = await this._exportsService.getPlaylistById(
             playlistId,
@@ -34,14 +39,28 @@ class ConsumerService {
             JSON.stringify(playlist),
           );
 
+          console.log(`Export sent successfully to: ${targetEmail}`);
+
+          // Acknowledge pesan jika berhasil
           channel.ack(message);
         } catch (error) {
           console.error('Error processing message:', error);
-          channel.nack(message, false, false);
+
+          // PENTING: Jika playlist tidak ditemukan atau error lainnya,
+          // jangan kembalikan pesan ke queue (hindari infinite loop)
+          // Acknowledge pesan untuk menghapusnya dari queue
+          channel.ack(message);
+
+          // Alternatif: Jika ingin menyimpan pesan yang gagal,
+          // bisa kirim ke dead letter queue
+          // channel.nack(message, false, false);
         }
       });
     } catch (error) {
       console.error('Failed to consume messages:', error);
+
+      // Retry connection setelah 5 detik jika gagal
+      setTimeout(() => this._consume(), 5000);
     }
   }
 }

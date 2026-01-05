@@ -164,7 +164,7 @@ class AlbumsService {
         likes: JSON.parse(result),
         source: 'cache',
       };
-    } catch (error) {
+    } catch {
       // Get from database
       const query = {
         text: 'SELECT COUNT(*) FROM user_album_likes WHERE album_id = $1',
