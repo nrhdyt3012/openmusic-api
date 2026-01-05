@@ -9,9 +9,11 @@ const routes = (handler) => [
     options: {
       payload: {
         allow: 'multipart/form-data',
-        multipart: true,
-        output: 'stream',
-        maxBytes: 512000,
+        multipart: {
+          output: 'stream',
+        },
+        maxBytes: 512000, // 512KB
+        parse: true,
       },
     },
   },
