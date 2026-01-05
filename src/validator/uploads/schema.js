@@ -1,4 +1,3 @@
-// src/validator/uploads/schema.js
 const Joi = require('joi');
 
 const ImageHeadersSchema = Joi.object({

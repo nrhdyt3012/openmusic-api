@@ -1,4 +1,3 @@
-// src/api/uploads/routes.js
 const path = require('path');
 
 const routes = (handler) => [
@@ -8,12 +7,11 @@ const routes = (handler) => [
     handler: handler.postUploadImageHandler,
     options: {
       payload: {
-        allow: 'multipart/form-data',
-        multipart: {
-          output: 'stream',
-        },
-        maxBytes: 512000, // 512KB
+        output: 'stream',
         parse: true,
+        allow: 'multipart/form-data',
+        maxBytes: 512000,
+        multipart: true,
       },
     },
   },

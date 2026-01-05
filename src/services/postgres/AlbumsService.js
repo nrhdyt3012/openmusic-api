@@ -79,6 +79,19 @@ class AlbumsService {
   }
 
   async addAlbumCover(id, coverUrl) {
+  // Cek dulu apakah album exists
+    const checkQuery = {
+      text: 'SELECT id FROM albums WHERE id = $1',
+      values: [id],
+    };
+
+    const checkResult = await this._pool.query(checkQuery);
+
+    if (!checkResult.rows.length) {
+      throw new NotFoundError('Album tidak ditemukan');
+    }
+
+    // Update cover
     const query = {
       text: 'UPDATE albums SET cover_url = $1 WHERE id = $2 RETURNING id',
       values: [coverUrl, id],
@@ -87,9 +100,10 @@ class AlbumsService {
     const result = await this._pool.query(query);
 
     if (!result.rows.length) {
-      throw new NotFoundError('Gagal menambahkan cover. Id tidak ditemukan');
+      throw new InvariantError('Gagal menambahkan cover');
     }
   }
+
 
   async likeAlbum(userId, albumId) {
     // Check if album exists

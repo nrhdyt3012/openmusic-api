@@ -1,4 +1,3 @@
-// src/validator/uploads/index.js
 const InvariantError = require('../../exceptions/InvariantError');
 const { ImageHeadersSchema } = require('./schema');
 
@@ -7,7 +6,7 @@ const UploadsValidator = {
     const validationResult = ImageHeadersSchema.validate(headers);
 
     if (validationResult.error) {
-      throw new InvariantError(validationResult.error.message);
+      throw new InvariantError('Format gambar tidak valid');
     }
   },
 };

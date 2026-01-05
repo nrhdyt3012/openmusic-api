@@ -166,10 +166,28 @@ const init = async () => {
     },
   ]);
 
+  // ERROR HANDLER - CRITICAL SECTION
   server.ext('onPreResponse', (request, h) => {
     const { response } = request;
 
     if (response instanceof Error) {
+    // Log error untuk debugging
+      console.error('Error caught in onPreResponse:');
+      console.error('Name:', response.name);
+      console.error('Message:', response.message);
+      console.error('StatusCode:', response.statusCode || response.output?.statusCode);
+
+      // Handle Payload Too Large (413)
+      if (response.output && response.output.statusCode === 413) {
+        const newResponse = h.response({
+          status: 'fail',
+          message: response.message,
+        });
+        newResponse.code(413);
+        return newResponse;
+      }
+
+      // Handle ClientError (400, 401, 403, 404)
       if (response instanceof ClientError) {
         const newResponse = h.response({
           status: 'fail',
@@ -179,6 +197,17 @@ const init = async () => {
         return newResponse;
       }
 
+      // Handle Boom errors
+      if (response.isBoom) {
+        const newResponse = h.response({
+          status: 'fail',
+          message: response.message,
+        });
+        newResponse.code(response.output.statusCode);
+        return newResponse;
+      }
+
+      // Handle Server Errors
       if (!response.isServer) {
         return h.continue;
       }
@@ -188,7 +217,7 @@ const init = async () => {
         message: 'Maaf, terjadi kegagalan pada server kami.',
       });
       newResponse.code(500);
-      console.error(response);
+      console.error('Full error:', response);
       return newResponse;
     }
 

@@ -1,4 +1,3 @@
-// src/api/uploads/handler.js
 const config = require('../../utils/config');
 
 class UploadsHandler {
@@ -25,19 +24,18 @@ class UploadsHandler {
         return response;
       }
 
-      // Validate image headers
-      this._validator.validateImageHeaders(cover.hapi.headers);
-
-      // Check file size
-      const fileSize = cover.hapi.headers['content-length'];
-      if (fileSize && parseInt(fileSize) > 512000) {
+      // Check if cover has hapi property
+      if (!cover.hapi) {
         const response = h.response({
           status: 'fail',
-          message: 'Ukuran file terlalu besar. Maksimal 512KB',
+          message: 'Format payload tidak valid',
         });
-        response.code(413);
+        response.code(400);
         return response;
       }
+
+      // Validate image headers
+      this._validator.validateImageHeaders(cover.hapi.headers);
 
       // Write file
       const filename = await this._storageService.writeFile(cover, cover.hapi);
@@ -53,7 +51,7 @@ class UploadsHandler {
       response.code(201);
       return response;
     } catch (error) {
-      // Let error handler in server.js handle it
+      // Jika error dari validator atau service, throw ulang
       throw error;
     }
   }
