@@ -74,7 +74,7 @@ const init = async () => {
     },
   });
 
-  // Register plugins
+  // Register plugins - URUTAN PENTING!
   await server.register([
     {
       plugin: Jwt,
@@ -101,6 +101,7 @@ const init = async () => {
     }),
   });
 
+  // Register all route plugins
   await server.register([
     {
       plugin: albums,
@@ -171,24 +172,38 @@ const init = async () => {
     const { response } = request;
 
     if (response instanceof Error) {
-    // Log error untuk debugging
-      console.error('Error caught in onPreResponse:');
+      // Log error untuk debugging
+      console.error('=== ERROR HANDLER ===');
       console.error('Name:', response.name);
       console.error('Message:', response.message);
       console.error('StatusCode:', response.statusCode || response.output?.statusCode);
+      console.error('IsBoom:', response.isBoom);
 
-      // Handle Payload Too Large (413)
+      // Handle Payload Too Large (413) - HARUS PALING ATAS
       if (response.output && response.output.statusCode === 413) {
+        console.log('Handling 413 error');
         const newResponse = h.response({
           status: 'fail',
-          message: response.message,
+          message: 'Payload content length greater than maximum allowed: 512000',
         });
         newResponse.code(413);
         return newResponse;
       }
 
+      // Handle Unsupported Media Type (415)
+      if (response.output && response.output.statusCode === 415) {
+        console.log('Handling 415 error');
+        const newResponse = h.response({
+          status: 'fail',
+          message: 'Unsupported Media Type',
+        });
+        newResponse.code(415);
+        return newResponse;
+      }
+
       // Handle ClientError (400, 401, 403, 404)
       if (response instanceof ClientError) {
+        console.log('Handling ClientError');
         const newResponse = h.response({
           status: 'fail',
           message: response.message,
@@ -199,6 +214,7 @@ const init = async () => {
 
       // Handle Boom errors
       if (response.isBoom) {
+        console.log('Handling Boom error');
         const newResponse = h.response({
           status: 'fail',
           message: response.message,

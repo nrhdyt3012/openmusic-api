@@ -10,50 +10,25 @@ class UploadsHandler {
   }
 
   async postUploadImageHandler(request, h) {
-    try {
-      const { cover } = request.payload;
-      const { id } = request.params;
+    const { cover } = request.payload;
+    const { id } = request.params;
 
-      // Check if cover exists
-      if (!cover) {
-        const response = h.response({
-          status: 'fail',
-          message: 'Cover tidak ditemukan',
-        });
-        response.code(400);
-        return response;
-      }
+    // Validasi image headers
+    this._validator.validateImageHeaders(cover.hapi.headers);
 
-      // Check if cover has hapi property
-      if (!cover.hapi) {
-        const response = h.response({
-          status: 'fail',
-          message: 'Format payload tidak valid',
-        });
-        response.code(400);
-        return response;
-      }
+    // Write file
+    const filename = await this._storageService.writeFile(cover, cover.hapi);
+    const coverUrl = `http://${config.app.host}:${config.app.port}/upload/images/${filename}`;
 
-      // Validate image headers
-      this._validator.validateImageHeaders(cover.hapi.headers);
+    // Update album cover
+    await this._albumsService.addAlbumCover(id, coverUrl);
 
-      // Write file
-      const filename = await this._storageService.writeFile(cover, cover.hapi);
-      const coverUrl = `http://${config.app.host}:${config.app.port}/upload/images/${filename}`;
-
-      // Update album cover
-      await this._albumsService.addAlbumCover(id, coverUrl);
-
-      const response = h.response({
-        status: 'success',
-        message: 'Sampul berhasil diunggah',
-      });
-      response.code(201);
-      return response;
-    } catch (error) {
-      // Jika error dari validator atau service, throw ulang
-      throw error;
-    }
+    const response = h.response({
+      status: 'success',
+      message: 'Sampul berhasil diunggah',
+    });
+    response.code(201);
+    return response;
   }
 }
 
